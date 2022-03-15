@@ -91,8 +91,30 @@
     </tr>
     <tr>
         <td>RF-13</td>
+        <td>Barra de progresso</td>
+        <td>Cada lista terá sua barra de progresso baseado na finalização de suas tarefas</td>
+        <td>Média</td>
+    </tr>
+    <tr>
+        <td>RF-14</td>
         <td>Exportar listas de tarefas</td>
         <td>Permite baixar as listas de tarefas em PDF ou XLSX</td>
         <td>Baixa</td>
     </tr>
 </table>
+
+<h2>Processos</h2>
+<p>
+&ensp;&ensp;A gestão de processos será feita através de um projeto no Github, com os RFs definidos através de issues e organizados conforme o desenvolvimento.
+</p>
+
+<h2>Desenvolvimento</h2>
+<p>
+&ensp;&ensp;Todo o código será versionado neste repositório (tanto backend quanto frontend). A linguagem a ser usada será <a href="https://rubyonrails.org">Ruby On Rails</a>. O código deste repositório está organizado em quatro partes:
+<ol>
+    <li><i>main</i>: branch principal, onde fica o código final testado e aprovado.</li>
+    <li><i>develop</i>: branch secundária, onde o código é integrado com as diversas funcionalidades.</li>
+    <li><i>feature</i>/: conjunto de branchs que tratam da introdução de funcionalidades.</li>
+    <li><i>hotfix</i>/: conjunto de branchs que tratam da resolução de problemas que surgiram com as <i>features</i>.</li>
+</ol>
+</p>
