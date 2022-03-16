@@ -18,6 +18,10 @@ const TaskSchema = new Schema({
         type: Date,
         required: false
     },
+    tags: [{
+        type: Schema.ObjectId,
+        ref: 'Tag',
+    }],
     __v: {
         type: Number,
         select: false
