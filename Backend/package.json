@@ -1,0 +1,35 @@
+{
+  "name": "v361",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=prod node src/server.js",
+    "test": "cross-env NODE_ENV=test mocha",
+    "dev": "cross-env NODE_ENV=dev nodemon src/server.js"
+  },
+  "author": "Franklin Regis",
+  "dependencies": {
+    "body-parser": "^1.19.2",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "module-alias": "^2.2.2",
+    "mongoose": "^6.2.6"
+  },
+  "_moduleAliases": {
+    "@app": "src/app.js",
+    "@config": "src/config/index.js",
+    "@controller": "src/controller",
+    "@routes": "src/routes",
+    "@model": "src/model"
+  },
+  "devDependencies": {
+    "chai": "^4.3.6",
+    "chai-http": "^4.3.0",
+    "eslint": "^8.11.0",
+    "mocha": "^9.2.2",
+    "mongodb-memory-server": "^8.4.1",
+    "nodemon": "^2.0.15"
+  }
+}
