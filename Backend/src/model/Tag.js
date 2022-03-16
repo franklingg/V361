@@ -1,19 +1,21 @@
 const { Schema, model } = require('mongoose');
 
-const TaskListSchema = new Schema({
-    name: {
+const TagSchema = new Schema({
+    title: {
         type: String,
+        unique: true,
         required: true,
     },
     color: {
         type: String,
         required: false,
+        default: "#000"
+    },
+    textColor: {
+        type: String,
+        required: false,
         default: "#FFF"
     },
-    tasks: [{
-        type: Schema.ObjectId,
-        ref: 'Task',
-    }],
     __v: {
         type: Number,
         select: false
@@ -21,6 +23,7 @@ const TaskListSchema = new Schema({
 },
     {
         timestamps: true,
+        id: true
     });
 
-module.exports = model('TaskList', TaskListSchema);
+module.exports = model('Tag', TagSchema);

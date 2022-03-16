@@ -8,5 +8,6 @@ router.put('/:id', TaskController.editTask);
 router.delete('/:id', TaskController.removeTask);
 router.patch('/:id/done', TaskController.markAsDone);
 router.patch('/:id/not_done', TaskController.unmarkDone);
+router.post('/:id/tags', TaskController.changeTags);
 
 module.exports = router;
