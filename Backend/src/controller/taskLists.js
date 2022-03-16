@@ -1,5 +1,4 @@
 const TaskList = require("@model/TaskList");
-const Task = require("@model/Task");
 
 TaskListController = {
     async getAllTaskLists(req, res) {
@@ -60,34 +59,6 @@ TaskListController = {
             return res.status(200).send(undefined);
         } catch (err) {
             return res.status(400).send({ error: "Id inválido, lista de tarefas não removida" });
-        }
-    },
-
-    async addTaskToList(req, res) {
-        try {
-            const newTask = new Task(req.body);
-            const taskList = await TaskList.findById(req.params.id)
-            const response = await newTask.save();
-            await taskList.update({tasks: [...taskList.get('tasks'), newTask]});
-            return res.status(200).send(response);
-        } catch (err) {
-            return res
-                .status(400)
-                .send({ error: "Dados inválidos, lista de tarefas não criada" });
-        }
-    },
-
-    async removeTaskFromList(req, res) {
-        try {
-            const removedTask = await Task.findByIdAndDelete(req.body.task_id);
-            const taskList = await TaskList.findById(req.params.id);
-            const tasksUpdated = taskList.get('tasks').filter(taskId => taskId.valueOf() !== req.body.task_id)
-            await taskList.updateOne({tasks: tasksUpdated});
-            return res.status(200).send(removedTask);
-        } catch (err) {
-            return res
-                .status(400)
-                .send({ error: "Dados inválidos, lista de tarefas não criada" });
         }
     },
 };

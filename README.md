@@ -68,7 +68,7 @@
     <tr>
         <td>RF-09</td>
         <td>Altera status de tarefas</td>
-        <td>Permite alterar os atributos principais de tarefas (status e data de início/conclusão)</td>
+        <td>Permite alterar os atributos principais de tarefas (data de início/conclusão)</td>
         <td>Alta</td>
     </tr>
     <tr>
@@ -110,7 +110,7 @@
 
 <h2>Desenvolvimento</h2>
 <p>
-&ensp;&ensp;Todo o código será versionado neste repositório (tanto backend quanto frontend). A linguagem a ser usada será <a href="https://rubyonrails.org">Ruby On Rails</a>. O código deste repositório está organizado em quatro partes:
+&ensp;&ensp;Todo o código será versionado neste repositório (tanto backend quanto frontend). A linguagem a ser usada será Javascript, usando o framework <a href="https://nodejs.org/en/">NodeJs</a> no Backend e <a href="https://pt-br.reactjs.org">ReactJs</a> no Frontend. O código deste repositório está organizado em quatro partes:
 <ol>
     <li><i>main</i>: branch principal, onde fica o código final testado e aprovado.</li>
     <li><i>develop</i>: branch secundária, onde o código é integrado com as diversas funcionalidades.</li>

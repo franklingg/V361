@@ -17,10 +17,15 @@ const TaskSchema = new Schema({
     finish_date: {
         type: Date,
         required: false
+    },
+    __v: {
+        type: Number,
+        select: false
     }
 },
     {
         timestamps: true,
+        id: true
     });
 
 module.exports = model('Task', TaskSchema);
