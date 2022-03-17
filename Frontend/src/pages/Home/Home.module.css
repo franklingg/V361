@@ -1,0 +1,71 @@
+.home{
+    background-color: var(--blue);
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    font-family: 'Open Sans';
+}
+
+.home__logo, .home__logo > img{
+    height: 105px;
+}
+
+.home__info{
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    margin: 0 100px;
+    gap: 56px;
+    text-align: justify;
+}
+
+.home__text{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin: 100px 0 0 100px;
+    gap: 15px;
+}
+
+.home__text > p {
+    text-indent: 15px;
+}
+
+.home__link{
+    margin-top: 15px;
+    background-color: var(--yellow-dark);
+    border: none;
+    border-radius: 15px;
+    box-shadow: 2px 1px 1px var(--yellow-dark);
+    padding: 10px;
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    transition: all 0.15s ease-in-out;
+}
+
+.home__link:hover{
+    cursor: pointer;
+    transform: scale(1.05);
+}
+
+.home__banner, .home__banner > img{
+    height: 490px;
+}
+
+.home__footer{
+    padding: 5px 0;
+    background-color: var(--gray);
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    font-size: 12px;
+}
+
+.home__footer > * {
+    text-decoration: none;
+    color: var(--yellow)
+}
