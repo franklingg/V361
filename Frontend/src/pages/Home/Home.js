@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import styles from './Home.module.css';
 import Logo from '../../assets/logo.png';
 import Banner from '../../assets/banner.png';
+import { Footer } from '../../components';
 
 export default function Home(){
 
@@ -24,12 +25,7 @@ export default function Home(){
                     <img src={Banner} alt="Banner da página inicial" />
                 </div>
             </section>
-            <footer className={styles.home__footer}>
-                <a href="https://storyset.com/online" target="_blank" rel="noreferrer">
-                    Online illustrations by Storyset
-                </a>
-                <span>Franklin Regis ® 2022</span>
-            </footer>
+            <Footer color="var(--gray)" />
         </div>
     );
 }
