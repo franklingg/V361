@@ -31,7 +31,7 @@ TaskController = {
             const newTask = new Task(req.body);
             const response = await newTask.save();
             const taskList = await TaskList.findById(req.body.task_list_id)
-            await taskList.replaceOne({tasks: [...taskList.get('tasks'), newTask]});
+            await taskList.updateOne({tasks: [...taskList.get('tasks'), newTask]});
             return res.status(200).send(response);
         } catch (err) {
             return res
@@ -52,9 +52,13 @@ TaskController = {
     async removeTask(req, res) {
         try {
             const removedTask = await Task.findByIdAndDelete(req.params.id);
-            const taskList = await TaskList.findOne({ tasks: removedTask._id });
-            const tasksUpdated = taskList.get('tasks').filter(taskId => taskId.valueOf() !== req.query.task_list_id)
-            await taskList.replaceOne({tasks: tasksUpdated});
+            TaskList.findOne({ tasks: removedTask._id })
+                    .then(async taskList => {
+                        if(taskList){
+                            const tasksUpdated = taskList.get('tasks').filter(taskId => taskId.valueOf() !== req.query.task_list_id)
+                            await taskList.updateOne({tasks: tasksUpdated});
+                        }
+                    });
             return res.status(200).send(removedTask);
         } catch (err) {
             return res
@@ -84,6 +88,7 @@ TaskController = {
     async changeTags(req, res) {
         try {
             const tags = await Tag.find({ 'title': { $in: req.body.tags } });
+            await Task.exists({ "id": req.params.id })
             const response = await Task.findByIdAndUpdate(req.params.id, {tags}, { new: true });
             return res.status(200).send(response);
         } catch (err) {

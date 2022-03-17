@@ -40,7 +40,7 @@ TagsController = {
     async editTag(req, res) {
         try {
             const title = req.params.title.replace(/_/g, " ")
-            const tag = await Tag.findOneAndReplace({title}, req.body, { new: true });
+            const tag = await Tag.findOneAndUpdate({title}, req.body, { new: true });
             return res.status(200).send(tag);
         } catch (err) {
             return res.status(400).send({ error: "Dados inválidos, tag não editada" });

@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose');
+const TagModel = require('./Tag');
 
 const TaskSchema = new Schema({
     name: {
@@ -19,7 +20,7 @@ const TaskSchema = new Schema({
         required: false
     },
     tags: [{
-        type: Schema.ObjectId,
+        type: TagModel.schema,
         ref: 'Tag',
     }],
     __v: {
