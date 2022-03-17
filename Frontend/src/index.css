@@ -11,6 +11,9 @@ body {
   --pink: #f16775;
   --yellow: #fee36e;
   --yellow-dark: #ceb92c;
+  --green: #3ab34a;
+  --red: #dc4c3d;
+  --orange: #F38851;
   --gray: #2a2a2a;
   --white: #FFFFF1;
   font-family: 'Open Sans', sans-serif;
@@ -23,4 +26,14 @@ code {
 
 p, h1, h2 {
   margin: 0;
+}
+
+button {
+  font-family: 'Open Sans';
+  transition: all 0.15s ease-in-out;
+}
+
+button:hover{
+  cursor: pointer;
+  transform: scale(1.1);
 }
