@@ -32,7 +32,7 @@ TaskController = {
             const response = await newTask.save();
             const taskList = await TaskList.findById(req.body.task_list_id)
             await taskList.updateOne({tasks: [...taskList.get('tasks'), newTask]});
-            return res.status(200).send(response);
+            return res.status(201).send(response);
         } catch (err) {
             return res
                 .status(400)
@@ -59,7 +59,7 @@ TaskController = {
                             await taskList.updateOne({tasks: tasksUpdated});
                         }
                     });
-            return res.status(200).send(removedTask);
+            return res.status(204).send(undefined);
         } catch (err) {
             return res
                 .status(400)

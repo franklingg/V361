@@ -1,159 +1,171 @@
 const chai = require('chai');
 const chai_http = require('chai-http');
-const jwt = require('jsonwebtoken');
 const should = chai.should();
 const server = require('../src/server');
 const databaseConfig = require('../src/config/database');
-const User = require('@model/User');
-const Task = require('@model/Task');
 const httpCodes = require('./status');
 
 chai.use(chai_http);
 
-const createTestToken = async () => {
-    const testEmail = "test@codexjr.com.br";
-    var user = await User.findOne({ email: testEmail });
-    const token = jwt.sign({ sub: user._id }, process.env.JWT_SECRET, { expiresIn: '4s' });
-    user.token_list.push(token);
-    await user.save();
-    return token;
-}
+let taskListId;
+let taskId;
 
-const createTestTask = async () => {
-    const testEmail = "test@codexjr.com.br";
-    try {
-        var user = await User.findOne({ email: testEmail });
-    } catch (err) {
-        console.log(err);
-    }
-    const testTask = new Task({ userId: user._id, name: "Task da codex" });
-    const task = await testTask.save();
-    return task._id;
-}
-
-describe('Users Test', async function () {
-    before(function () {
-        databaseConfig();
-    });
-
-    it('Requisição feita com token inválido', async function () {
-        const incorrect_token = "Bearer 123123";
+describe('Tag Test', async function () {
+    it('Criar Tag', async function () {
         const response = await chai.request(server)
-            .get('/users')
-            .set('authorization', incorrect_token);
-        response.should.have.status(httpCodes.failure.AUTHENTICATION);
-    });
-
-    it('Aquisição de informação do usuário', async function () {
-        const token = await createTestToken();
-        const response = await chai.request(server)
-            .get('/users')
-            .set({ 'authorization': "Bearer " + token });
-        response.should.have.status(httpCodes.success.OK);
-        response.body.should.be.a("object");
-        response.body.should.have.property("name");
-        response.body.should.have.property("_id");
-        response.body.should.have.property("email");
-    });
-
-    it('Criar novo usuário com dados insuficientes', async function () {
-        var response = await chai.request(server)
-            .post('/users/register')
-            .send({ "email": "test@codexjr.com.br", "password": "senha" });
-        response.should.have.status(httpCodes.failure.BAD_REQUEST);
-    });
-
-    it('Criar novo usuário já cadastrado', async function () {
-        var response = await chai.request(server)
-            .post('/users/register')
-            .send({ "name": "Codex", "email": "test@codexjr.com.br", "password": "senha" });
-        response.should.have.status(httpCodes.failure.BAD_REQUEST);
-    });
-
-    it('Criar novo usuário', async function () {
-        await User.deleteOne({ email: "test@codexjr.com.br" });
-        var response = await chai.request(server)
-            .post('/users/register')
-            .send({ "name": "Codex", "email": "test@codexjr.com.br", "password": "senha" });
+            .post('/tags')
+            .send({ 'title': 'Test Tag', 'color': "#A930FD" });
         response.should.have.status(httpCodes.success.CREATED);
-        response.body.should.be.a("object");
-        response.body.should.have.property("email");
-        response.body.should.have.property("name");
-        response.body.should.have.property("token_list");
+        response.body.should.be.a('object');
+        response.body.should.have.property('title');
+        response.body.should.have.property('color');
+        response.body.should.have.property('textColor');
     });
 
-    it('Login com email não cadastrado', async function () {
-        const incorrect_email = "email@mail.com";
+    it('Buscar Tag', async function () {
         const response = await chai.request(server)
-            .post('/user/login')
-            .send({ "email": incorrect_email, "password": "senha" });
-        response.should.have.status(httpCodes.failure.NOT_FOUND);
-    });
-
-    it('Login com credenciais corretas', async function () {
-        const correct_email = "test@codexjr.com.br";
-        const response = await chai.request(server)
-            .post('/users/login')
-            .send({ "email": correct_email, "password": "senha" });
+            .get('/tags');
         response.should.have.status(httpCodes.success.OK);
-        response.body.should.have.property('name');
-        response.body.should.have.property('email');
-        response.body.should.have.property('token_list');
+        response.body.should.be.an('array');
+        response.body.should.have.lengthOf(1);
     });
 
-    it('Logout do usuário', async function () {
-        const token = await createTestToken();
+    it('Buscar Tag específica', async function () {
         const response = await chai.request(server)
-            .put('/users/logout')
-            .set({ 'authorization': "Bearer " + token });
-        response.should.have.status(httpCodes.success.DELETED);
-        response.body.should.be.eql({});
+            .get(`/tags/Test_Tag`);
+        response.should.have.status(httpCodes.success.OK);
+        response.body.should.include({title: "Test Tag", color: "#A930FD", textColor: "#FFF"});
+    });
+
+    it('Atualizar Tag', async function () {
+        const response = await chai.request(server)
+            .put(`/tags/Test_Tag`)
+            .send({ 'textColor': '#EEE' });
+        response.should.have.status(httpCodes.success.OK);
+        response.body.should.include({title: "Test Tag", color: "#A930FD", textColor: "#EEE"});
     });
 });
 
-describe('Tasks Test', async function () {
-    it('Criar tarefa', async function () {
-        const token = await createTestToken();
+describe('Task List Test', async function () {
+    before(function () {
+        databaseConfig();
+    });
+    
+    it('Criar lista de tarefas', async function () {
         const response = await chai.request(server)
-            .post('/tasks/add')
-            .set('authorization', 'Bearer ' + token)
-            .send({ 'name': 'Atividade de p2' });
+            .post('/task_lists')
+            .send({ 'name': 'Test Task List 1', 'color': "#CCC" });
         response.should.have.status(httpCodes.success.CREATED);
         response.body.should.be.a('object');
         response.body.should.have.property('name');
-        response.body.should.have.property('highPriority');
+        response.body.should.have.property('color');
+        taskListId = response.body._id;
     });
 
-    it('Retornar tarefas', async function () {
-        const token = await createTestToken();
+    it('Buscar lista de tarefas', async function () {
         const response = await chai.request(server)
-            .post('/tasks/add')
-            .set('authorization', 'Bearer ' + token)
-            .send({ 'name': 'Atividade de p2' });
-        response.should.have.status(httpCodes.success.CREATED);
-        response.body.should.have.property('name');
-        response.body.should.have.property('highPriority');
-    });
-
-    it('Atualizar tarefa', async function () {
-        const token = await createTestToken();
-        const idTask = await createTestTask();
-        const response = await chai.request(server)
-            .put('/tasks/update/' + idTask)
-            .set('authorization', 'Bearer ' + token)
-            .send({ 'highPriority': 'true' });
+            .get('/task_lists');
         response.should.have.status(httpCodes.success.OK);
-        response.body.should.have.property('name');
-        response.body.should.have.property('highPriority');
-        response.body.highPriority.should.be.true;
+        response.body.should.be.an('array');
+        response.body.should.have.lengthOf(1);
     });
 
-    it('Deletar tarefa', async function () {
-        const token = await createTestToken();
-        const idTask = await createTestTask();
+    it('Buscar Lista de Tarefas específica', async function () {
         const response = await chai.request(server)
-            .delete('/tasks/remove/' + idTask)
-            .set('authorization', 'Bearer ' + token);
+            .get(`/task_lists/${taskListId}`);
+        response.should.have.status(httpCodes.success.OK);
+        response.body.should.include({name: "Test Task List 1", color: "#CCC"});
+    });
+
+    it('Atualizar Lista de Tarefas', async function () {
+        const response = await chai.request(server)
+            .put(`/task_lists/${taskListId}`)
+            .send({ 'color': '#CCC' });
+        response.should.have.status(httpCodes.success.OK);
+        response.body.should.include({name: "Test Task List 1", color: "#CCC"});
+    });
+    
+});
+
+describe('Task Test', async function () {
+    it('Criar tarefa', async function () {
+        const response = await chai.request(server)
+            .post('/tasks')
+            .send({ 'name': 'Test Task 1', 'task_list_id': taskListId });
+        response.should.have.status(httpCodes.success.CREATED);
+        response.body.should.be.a('object');
+        response.body.should.have.property('name');
+        response.body.should.have.property('done');
+        taskId = response.body._id;
+    });
+
+    it('Buscar tarefas', async function () {
+        const response = await chai.request(server)
+            .get('/tasks');
+        response.should.have.status(httpCodes.success.OK);
+        response.body.should.be.an('array');
+        response.body.should.have.lengthOf(1);
+    });
+
+    it('Buscar Tarefa específica', async function () {
+        const response = await chai.request(server)
+            .get(`/tasks/${taskId}`);
+        response.should.have.status(httpCodes.success.OK);
+        response.body.should.include({name: "Test Task 1"});
+    });
+
+    it('Atualizar Tarefa', async function () {
+        const response = await chai.request(server)
+            .put(`/tasks/${taskId}`)
+            .send({ 'start_date': '2000-12-15' });
+        response.should.have.status(httpCodes.success.OK);
+        response.body.should.include({name: "Test Task 1", start_date: '2000-12-15T00:00:00.000Z'});
+    });
+
+    it('Marcar como concluída', async function () {
+        const response = await chai.request(server)
+            .patch(`/tasks/${taskId}/done`);
+        response.should.have.status(httpCodes.success.OK);
+        response.body.should.include({name: "Test Task 1", done: true});
+    });
+
+    it('Marcar como não-concluída', async function () {
+        const response = await chai.request(server)
+            .patch(`/tasks/${taskId}/not_done`);
+        response.should.have.status(httpCodes.success.OK);
+        response.body.should.include({name: "Test Task 1", done: false});
+    });
+
+    it('Adicionar tags', async function () {
+        const response = await chai.request(server)
+            .put(`/tasks/${taskId}/tags`)
+            .send({tags: ['Test Tag']});
+        response.should.have.status(httpCodes.success.OK);
+        response.body.should.include({name: "Test Task 1"});
+        response.body.tags.should.have.lengthOf(1);
+        response.body.tags[0].should.include({title: "Test Tag", color: '#A930FD' });
+    });
+
+});
+
+describe('Deletions Test', async () => {
+    it('Deletar Tarefa', async function () {
+        const response = await chai.request(server)
+            .delete(`/tasks/${taskId}`)
+        response.should.have.status(httpCodes.success.DELETED);
+        response.body.should.be.eql({});
+    });
+
+    it('Deletar Tag', async function () {
+        const response = await chai.request(server)
+            .delete(`/tags/Test_Tag`)
+        response.should.have.status(httpCodes.success.DELETED);
+        response.body.should.be.eql({});
+    });
+
+    it('Deletar Lista de Tarefas', async function () {
+        const response = await chai.request(server)
+        .delete(`/task_lists/${taskListId}`)
         response.should.have.status(httpCodes.success.DELETED);
         response.body.should.be.eql({});
     });

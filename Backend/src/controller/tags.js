@@ -29,7 +29,7 @@ TagsController = {
         try {
             const newTag = new Tag(req.body);
             const response = await newTag.save();
-            return res.status(200).send(response);
+            return res.status(201).send(response);
         } catch (err) {
             return res
                 .status(400)
@@ -50,8 +50,8 @@ TagsController = {
     async removeTag(req, res) {
         try {
             const title = req.params.title.replace(/_/g, " ")
-            const removedTag = await Task.findOneAndDelete({title});
-            return res.status(200).send(removedTag);
+            const removedTag = await Tag.findOneAndDelete({title});
+            return res.status(204).send(undefined);
         } catch (err) {
             return res
                 .status(400)

@@ -56,7 +56,7 @@ TaskListController = {
     async deleteTaskList(req, res) {
         try {
             await TaskList.findByIdAndRemove(req.params.id);
-            return res.status(200).send(undefined);
+            return res.status(204).send(undefined);
         } catch (err) {
             return res.status(400).send({ error: "Id inválido, lista de tarefas não removida" });
         }
