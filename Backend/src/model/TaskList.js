@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose');
+const TaskModel = require('./Task');
 
 const TaskListSchema = new Schema({
     name: {
@@ -11,7 +12,7 @@ const TaskListSchema = new Schema({
         default: "#FFF"
     },
     tasks: [{
-        type: Schema.ObjectId,
+        type: TaskModel.schema,
         ref: 'Task',
     }],
     __v: {
