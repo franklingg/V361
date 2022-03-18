@@ -5,10 +5,12 @@ import { AiOutlineClose } from "react-icons/ai";
 import api from "../../services/api";
 import DatePicker from "react-datepicker";
 import moment from 'moment';
+import Select from 'react-select';
 
 export default function TaskModal({
   list,
   task,
+  tags,
   setTask,
   open,
   closeModal,
@@ -19,6 +21,11 @@ export default function TaskModal({
   const submitChanges = useCallback(async () => {
     try {
       let response;
+      const tags = task.tags || [];
+      setTask(old => {
+        delete old['tags'];
+        return old;
+      })
       if (isNewTask) {
         response = await api.post("/tasks", {
           ...task,
@@ -27,13 +34,14 @@ export default function TaskModal({
       } else {
         response = await api.put(`/tasks/${task._id}`, task);
       }
+      response = await api.put(`/tasks/${response.data._id}/tags`, {tags});
       setTask(response.data);
       closeModal();
       updateState();
     } catch (err) {
       console.error(err);
     }
-  }, [isNewTask, setTask, closeModal, updateState, task, list._id]);
+  }, [list.tags, list._id, setTask, isNewTask, closeModal, updateState, task]);
 
   useEffect(() => {
     setIsNewTask(Object.keys(task).length === 0);
@@ -83,6 +91,18 @@ export default function TaskModal({
           }
           selectsRange
           isClearable
+        />
+      </div>
+      <div className={styles.modal__field}>
+        <span>Tags </span>
+        <Select
+          options={tags.map(tag => ({value: tag.title, label: tag.title, text: tag.textColor, bg: tag.color }))}
+          defaultValue={task.tags?.length && task.tags.map(tag => ({value: tag.title, label: tag.title, text: tag.textColor, bg: tag.color }))}
+          placeholder="Selecione..."
+          noOptionsMessage={() => <span>Sem Tags</span>}
+          styles={{option: (provided, state)=> ({...provided, color: state.data.text, backgroundColor: state.data.bg})}}
+          onChange={(selectedTags)=> setTask({...task, tags: selectedTags.map(tag => tag.value)})}
+          isMulti
         />
       </div>
       <div className={styles.modal__buttons}>
