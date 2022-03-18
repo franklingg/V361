@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import styles from "./Board.module.css";
 import Logo from "../../assets/logo.png";
 import Broken from "../../assets/broken.png";
@@ -9,6 +9,7 @@ import {
   AiOutlineDelete,
   AiOutlinePlusCircle,
 } from "react-icons/ai";
+import { Form, ProgressBar } from "react-bootstrap";
 import { Footer, Loading, ListModal, TaskModal } from "../../components";
 
 export default function Board() {
@@ -81,7 +82,7 @@ export default function Board() {
 
   const markTask = useCallback(
     async (task, mark) => {
-      await api.patch(`/tasks/${task._id}/${mark ? 'done' : 'not_done'}`);
+      await api.patch(`/tasks/${task._id}/${mark ? "done" : "not_done"}`);
       updateState();
     },
     [updateState]
@@ -117,60 +118,69 @@ export default function Board() {
           </div>
         ) : (
           <div className={styles.board__main__on}>
-            {lists.map((list) => (
-              <div
-                className={styles.board__card}
-                style={{ backgroundColor: list.color }}
-              >
-                <AiOutlineEdit
-                  size={20}
-                  className={styles.board__card__edit}
-                  onClick={() => {
-                    openModalList(list);
-                  }}
-                />
-                <AiOutlineDelete
-                  size={20}
-                  className={styles.board__card__delete}
-                  onClick={() => {
-                    deleteList(list);
-                  }}
-                />
-                <h3>{list.name}</h3>
-                {list.tasks?.map((task) => (
-                  <div className={styles.board__card__task}>
-                    <input
-                      type="checkbox"
-                      checked={task.done}
-                      onChange={(e) => {
-                        markTask(task, e.target.checked);
-                      }}
-                    />
-                    <span>{task.name}</span>
-                    <AiOutlineEdit
-                      size={16}
-                      className={styles.board__task__edit}
-                      onClick={() => {
-                        openModalTask(list, task);
-                      }}
-                    />
-                    <AiOutlineDelete
-                      size={16}
-                      onClick={() => {
-                        deleteTask(task);
-                      }}
-                    />
-                  </div>
-                ))}
-                <AiOutlinePlusCircle
-                  size={27}
-                  className={styles.board__card__add}
-                  onClick={() => {
-                    openModalTask(list);
-                  }}
-                />
-              </div>
-            ))}
+            {lists.map((list) => {
+              const percentDone = 100 * list.tasks.reduce((sum, task) => (sum + (task.done ? 1 : 0)), 0) / list.tasks.length;
+              return (
+                <div
+                  className={styles.board__card}
+                  style={{ backgroundColor: list.color }}
+                >
+                  <AiOutlineEdit
+                    size={20}
+                    className={styles.board__card__edit}
+                    onClick={() => {
+                      openModalList(list);
+                    }}
+                  />
+                  <AiOutlineDelete
+                    size={20}
+                    className={styles.board__card__delete}
+                    onClick={() => {
+                      deleteList(list);
+                    }}
+                  />
+                  <h3>{list.name}</h3>
+                  {list.tasks?.map((task) => (
+                    <div className={styles.board__card__task}>
+                      <Form.Check
+                        type="checkbox"
+                        checked={task.done}
+                        onChange={(e) => {
+                          markTask(task, e.target.checked);
+                        }}
+                      />
+                      <span>{task.name}</span>
+                      <AiOutlineEdit
+                        size={16}
+                        className={styles.board__task__edit}
+                        onClick={() => {
+                          openModalTask(list, task);
+                        }}
+                      />
+                      <AiOutlineDelete
+                        size={16}
+                        onClick={() => {
+                          deleteTask(task);
+                        }}
+                      />
+                    </div>
+                  ))}
+                  <AiOutlinePlusCircle
+                    size={27}
+                    className={styles.board__card__add}
+                    onClick={() => {
+                      openModalTask(list);
+                    }}
+                  />
+                  <ProgressBar
+                    now={percentDone}
+                    variant="success"
+                    label={percentDone ? `${percentDone}%` : ""}
+                    className={styles.board__card__progress}
+                  />
+                </div>
+              );
+            })}
             <button
               className={styles.board__main__add}
               onClick={() => {
