@@ -37,7 +37,7 @@
     font-weight: 400;
 }
 
-.modal__field > input {
+.modal__field > input, .modal__datepicker__input {
     border: none;
     outline: none;
     border-radius: 10px;
@@ -63,4 +63,10 @@
 
 .modal__button__cancel{
     background-color: var(--red);
+}
+
+.modal__datepicker__clear::after {
+    background-color: transparent;
+    color: var(--gray);
+    font-size: 21px;
 }

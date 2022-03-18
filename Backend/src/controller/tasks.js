@@ -29,11 +29,12 @@ TaskController = {
     async addTask(req, res) {
         try {
             const newTask = new Task(req.body);
-            const response = await newTask.save();
             const taskList = await TaskList.findById(req.body.task_list_id)
             await taskList.updateOne({tasks: [...taskList.get('tasks'), newTask]});
+            const response = await newTask.save();
             return res.status(201).send(response);
         } catch (err) {
+            console.log(err)
             return res
                 .status(400)
                 .send({ error: "Dados inválidos, tarefas não criada" });
