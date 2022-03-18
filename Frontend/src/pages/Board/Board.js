@@ -3,11 +3,14 @@ import styles from "./Board.module.css";
 import Logo from "../../assets/logo.png";
 import Broken from "../../assets/broken.png";
 import api from "../../services/api";
+import moment from 'moment';
 import { BsPlusLg } from "react-icons/bs";
 import {
   AiOutlineEdit,
   AiOutlineDelete,
   AiOutlinePlusCircle,
+  AiFillPushpin,
+  AiOutlinePushpin,
 } from "react-icons/ai";
 import { Form, ProgressBar } from "react-bootstrap";
 import { Footer, Loading, ListModal, TaskModal } from "../../components";
@@ -16,6 +19,7 @@ export default function Board() {
   const [loading, setLoading] = useState(true);
   const [apiOn, setApiOn] = useState(true);
   const [lists, setLists] = useState([]);
+  const [fixedLists, setFixedLists] = useState([]);
   const [tags, setTags] = useState([]);
   const [openListModal, setOpenListModal] = useState(false);
   const [openTaskModal, setOpenTaskModal] = useState(false);
@@ -88,6 +92,20 @@ export default function Board() {
     [updateState]
   );
 
+  const pinList = useCallback((list)=>{
+    setFixedLists([...fixedLists, list._id]);
+  }, [fixedLists]);
+
+  const unpinList = useCallback((list)=>{
+    setFixedLists(fixedLists.filter(listId => listId !== list._id));
+  }, [fixedLists]);
+
+  const sortLists = useCallback(()=>{
+    const fixed = fixedLists.map(fixedId => lists.find(list => list._id === fixedId));
+    const notFixed = lists.filter(list => !fixed.includes(list));
+    return [...fixed, ...notFixed];
+  }, [fixedLists, lists]);
+
   useEffect(() => {
     updateState();
   }, [updateState]);
@@ -118,13 +136,36 @@ export default function Board() {
           </div>
         ) : (
           <div className={styles.board__main__on}>
-            {lists.map((list) => {
-              const percentDone = 100 * list.tasks.reduce((sum, task) => (sum + (task.done ? 1 : 0)), 0) / list.tasks.length;
+            {sortLists().map((list) => {
+              const percentDone =
+                (100 *
+                  list.tasks.reduce(
+                    (sum, task) => sum + (task.done ? 1 : 0),
+                    0
+                  )) /
+                list.tasks.length;
               return (
                 <div
                   className={styles.board__card}
                   style={{ backgroundColor: list.color }}
                 >
+                  {fixedLists.includes(list._id) ? (
+                    <AiFillPushpin
+                      size={20}
+                      className={styles.board__card__pin}
+                      onClick={() => {
+                        unpinList(list);
+                      }}
+                    />
+                  ) : (
+                    <AiOutlinePushpin
+                      size={20}
+                      className={styles.board__card__pin}
+                      onClick={() => {
+                        pinList(list);
+                      }}
+                    />
+                  )}
                   <AiOutlineEdit
                     size={20}
                     className={styles.board__card__edit}
@@ -149,7 +190,7 @@ export default function Board() {
                           markTask(task, e.target.checked);
                         }}
                       />
-                      <span>{task.name}</span>
+                      <span>{`${task.name}${task.start_date ? ": " + moment(task.start_date).format('DD/MM') + " - " + moment(task.finish_date).format('DD/MM') : ""}`}</span>
                       <AiOutlineEdit
                         size={16}
                         className={styles.board__task__edit}

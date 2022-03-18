@@ -45,11 +45,11 @@ const ListModal = ({list, setList, open, closeModal, updateState}) => {
             </h2>
             <div className={styles.modal__field}>
                 <span>Nome </span>
-                <input value={list.name || ""} onChange={(event)=>setList({...list, name:event.target.value})} />
+                <input maxLength={14} value={list.name || ""} onChange={(event)=>setList({...list, name:event.target.value})} />
             </div>
             <div className={styles.modal__field}>
                 <span>Cor </span>
-                <input value={list.color} onChange={(event)=>setList({...list, color:event.target.value})} />
+                <input maxLength={7} value={list.color} onChange={(event)=>setList({...list, color:event.target.value})} />
             </div>
             <div className={styles.modal__buttons}>
                 <button className={styles.modal__button__submit} onClick={submitChanges}>
