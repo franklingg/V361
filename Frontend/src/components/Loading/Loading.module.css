@@ -1,0 +1,19 @@
+
+.loading{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 150px;
+    gap: 20px;
+}
+
+.loading__spinner{
+    width: 65px !important;
+    fill: var(--orange) !important;
+}
+
+
+.loading__info {
+    color: var(--orange);
+    font-weight: 600;
+}
