@@ -23,6 +23,15 @@
     color: var(--orange);
 }
 
+.board__header__tags{
+    border: none;
+    border-radius: 10px;
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
 .board__main{
     flex: 1;
 }

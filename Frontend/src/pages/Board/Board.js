@@ -3,7 +3,7 @@ import styles from "./Board.module.css";
 import Logo from "../../assets/logo.png";
 import Broken from "../../assets/broken.png";
 import api from "../../services/api";
-import moment from 'moment';
+import moment from "moment";
 import { BsPlusLg } from "react-icons/bs";
 import {
   AiOutlineEdit,
@@ -11,9 +11,10 @@ import {
   AiOutlinePlusCircle,
   AiFillPushpin,
   AiOutlinePushpin,
+  AiOutlineAppstoreAdd
 } from "react-icons/ai";
 import { Form, ProgressBar } from "react-bootstrap";
-import { Footer, Loading, ListModal, TaskModal } from "../../components";
+import { Footer, Loading, ListModal, TaskModal, TagModal } from "../../components";
 
 export default function Board() {
   const [loading, setLoading] = useState(true);
@@ -23,6 +24,7 @@ export default function Board() {
   const [tags, setTags] = useState([]);
   const [openListModal, setOpenListModal] = useState(false);
   const [openTaskModal, setOpenTaskModal] = useState(false);
+  const [openTagModal, setOpenTagModal] = useState(false);
   const [listModal, setListModal] = useState({});
   const [taskModal, setTaskModal] = useState({});
 
@@ -42,6 +44,7 @@ export default function Board() {
     setTaskModal({});
     setOpenListModal(false);
     setOpenTaskModal(false);
+    setOpenTagModal(false);
   }, []);
 
   const updateState = useCallback(() => {
@@ -92,17 +95,25 @@ export default function Board() {
     [updateState]
   );
 
-  const pinList = useCallback((list)=>{
-    setFixedLists([...fixedLists, list._id]);
-  }, [fixedLists]);
+  const pinList = useCallback(
+    (list) => {
+      setFixedLists([...fixedLists, list._id]);
+    },
+    [fixedLists]
+  );
 
-  const unpinList = useCallback((list)=>{
-    setFixedLists(fixedLists.filter(listId => listId !== list._id));
-  }, [fixedLists]);
+  const unpinList = useCallback(
+    (list) => {
+      setFixedLists(fixedLists.filter((listId) => listId !== list._id));
+    },
+    [fixedLists]
+  );
 
-  const sortLists = useCallback(()=>{
-    const fixed = fixedLists.map(fixedId => lists.find(list => list._id === fixedId));
-    const notFixed = lists.filter(list => !fixed.includes(list));
+  const sortLists = useCallback(() => {
+    const fixed = fixedLists.map((fixedId) =>
+      lists.find((list) => list._id === fixedId)
+    );
+    const notFixed = lists.filter((list) => !fixed.includes(list));
     return [...fixed, ...notFixed];
   }, [fixedLists, lists]);
 
@@ -119,6 +130,7 @@ export default function Board() {
           className={styles.board__header__logo}
         />
         <h1 className={styles.board__header__title}>Meu Board de Tarefas</h1>
+        <button className={styles.board__header__tags} onClick={()=>setOpenTagModal(true)}> <AiOutlineAppstoreAdd size={18} /> Tags</button>
       </header>
       <main className={styles.board__main}>
         {loading ? (
@@ -190,7 +202,14 @@ export default function Board() {
                           markTask(task, e.target.checked);
                         }}
                       />
-                      <span>{`${task.name}${task.start_date ? ": " + moment(task.start_date).format('DD/MM') + " - " + moment(task.finish_date).format('DD/MM') : ""}`}</span>
+                      <span>{`${task.name}${
+                        task.start_date
+                          ? ": " +
+                            moment(task.start_date).format("DD/MM") +
+                            " - " +
+                            moment(task.finish_date).format("DD/MM")
+                          : ""
+                      }`}</span>
                       <AiOutlineEdit
                         size={16}
                         className={styles.board__task__edit}
@@ -246,7 +265,13 @@ export default function Board() {
         closeModal={closeModal}
         list={listModal}
         task={taskModal}
+        tags={tags}
         setTask={setTaskModal}
+        updateState={updateState}
+      />
+      <TagModal
+        open={openTagModal}
+        closeModal={closeModal}
         updateState={updateState}
       />
     </div>

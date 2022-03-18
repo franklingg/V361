@@ -37,12 +37,27 @@
     font-weight: 400;
 }
 
-.modal__field > input, .modal__datepicker__input {
+.modal__field > input {
     border: none;
     outline: none;
     border-radius: 10px;
     padding: 5px 10px;
-    width: 240px;
+}
+
+.modal__tagColor{
+    display: flex;
+    gap: 30px;
+}
+
+.modal__tag{
+    padding: 4px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.modal__tagColor > .modal__field > input{
+    width: 110px;
 }
 
 .modal__buttons{
@@ -63,14 +78,4 @@
 
 .modal__button__cancel{
     background-color: var(--red);
-}
-
-.modal__datepicker__clear::after {
-    background-color: transparent;
-    color: var(--gray);
-    font-size: 21px;
-}
-
-.modal__select{
-    width: 240px;
 }
