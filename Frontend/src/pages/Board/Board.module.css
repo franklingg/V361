@@ -78,7 +78,7 @@
     border-radius: 12px;
 }
 
-.board__card__edit, .board__card__delete {
+.board__card__edit, .board__card__delete, .board__card__pin {
     position: absolute;
     right: 12px;
     top: 15px;
@@ -87,6 +87,10 @@
 .board__card__edit {
     right: 39px;
     top: 16px;
+}
+
+.board__card__pin {
+    left: 16px;
 }
 
 .board__card__task{
@@ -106,6 +110,6 @@
 
 .board__card__progress{
     margin-top: auto;
-    height: 12px;
+    height: 14px;
     width: 240px;
 }
