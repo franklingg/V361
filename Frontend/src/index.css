@@ -28,12 +28,12 @@ p, h1, h2 {
   margin: 0;
 }
 
-button {
+button, svg {
   font-family: 'Open Sans';
   transition: all 0.15s ease-in-out;
 }
 
-button:hover{
+button:hover, svg:hover{
   cursor: pointer;
   transform: scale(1.1);
 }

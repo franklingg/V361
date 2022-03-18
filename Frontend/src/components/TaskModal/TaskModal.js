@@ -1,44 +1,46 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styles from './TaskModal.module.css';
 import Modal from 'react-modal';
 import { AiOutlineClose } from 'react-icons/ai';
 import api from '../../services/api';
 
-const TaskModal = React.forwardRef((props, ref) => {
+export default function TaskModal({list, task, setTask, open, closeModal, updateState}) {
 
-    const [ task, setTask ] = useState(props.task || {});
-
-    const closeModal = useCallback(() => {
-        setTask({});
-        ref.current?.portal.close();
-    }, [ref]);
+    const [isNewTask, setIsNewTask] = useState(true);
 
     const submitChanges = useCallback(async () => {
         try{
-            if(!props.task){
-                await api.post('/tasks', task );
+            let response;
+            if(isNewTask){
+                response = await api.post('/tasks', {...task, 'task_list_id': list._id } );
             } else {
-                await api.put('/tasks', task );
+                response = await api.put(`/tasks/${task._id}`, task );
             }
+            setTask(response.data);
             closeModal();
+            updateState();
         } catch(err){
             console.error(err);
         }
-    }, [props.task, closeModal, task]);
+    }, [closeModal, isNewTask, task, setTask, updateState]);
+
+    useEffect(()=>{
+        setIsNewTask(Object.keys(task).length === 0);
+    }, [open]);
 
     return (
         <Modal
-            ref={ref}
             className={styles.modal}
+            isOpen={open}
             overlayClassName={styles.modal__overlay}
             onRequestClose={closeModal}
-            style={{content: {backgroundColor: props.task ? task.color : "var(--pink)"}}}
+            style={{content: {backgroundColor: "var(--pink)"}}}
             shouldCloseOnEsc
             shouldCloseOnOverlayClick
         >
             <AiOutlineClose onClick={closeModal} size={18} className={styles.modal__close} />
             <h2 className={styles.modal__title}>
-                {!Object.keys(task).length ? "Criar" : "Editar"} Taska de Tarefas
+                {isNewTask ? "Criar" : "Editar"} Tarefa
             </h2>
             <div className={styles.modal__field}>
                 <span>Nome </span>
@@ -54,6 +56,4 @@ const TaskModal = React.forwardRef((props, ref) => {
             </div>
         </Modal>
     );
-});
-
-export default TaskModal;
+};

@@ -42,7 +42,15 @@ TaskController = {
 
     async editTask(req, res) {
         try {
-            const task = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
+            const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
+            const taskLists = await TaskList.find({});
+            taskLists.forEach(async taskList => {
+                const newTasks = taskList.tasks.map(task => {
+                    return task._id.valueOf() == updatedTask._id.valueOf() ? updatedTask : task;
+                });
+                await taskList.updateOne({tasks: newTasks});
+            });
+            return res.status(200).send(updatedTask);
             return res.status(200).send(task);
         } catch (err) {
             return res.status(400).send({ error: "Dados inválidos, tarefa não editada" });
@@ -51,14 +59,14 @@ TaskController = {
 
     async removeTask(req, res) {
         try {
-            const removedTask = await Task.findByIdAndDelete(req.params.id);
-            TaskList.findOne({ tasks: removedTask._id })
-                    .then(async taskList => {
-                        if(taskList){
-                            const tasksUpdated = taskList.get('tasks').filter(taskId => taskId.valueOf() !== req.query.task_list_id)
-                            await taskList.updateOne({tasks: tasksUpdated});
-                        }
-                    });
+            const removedTask = await Task.findByIdAndRemove(req.params.id);
+            const taskLists = await TaskList.find({});
+            taskLists.forEach(async taskList => {
+                const newTasks = taskList.tasks.filter(task => {
+                    return task._id.valueOf() !== removedTask._id.valueOf();
+                });
+                await taskList.updateOne({tasks: newTasks});
+            });
             return res.status(204).send(undefined);
         } catch (err) {
             return res
@@ -69,8 +77,15 @@ TaskController = {
 
     async markAsDone(req, res) {
         try {
-            const task = await Task.findByIdAndUpdate(req.params.id, { done: true }, { new: true });
-            return res.status(200).send(task);
+            const updatedTask = await Task.findByIdAndUpdate(req.params.id, { done: true }, { new: true });
+            const taskLists = await TaskList.find({});
+            taskLists.forEach(async taskList => {
+                const newTasks = taskList.tasks.map(task => {
+                    return task._id.valueOf() == updatedTask._id.valueOf() ? updatedTask : task;
+                });
+                await taskList.updateOne({tasks: newTasks});
+            });
+            return res.status(200).send(updatedTask);
         } catch (err) {
             return res.status(400).send({ error: "Id inválido, tarefa não atualizada" });
         }
@@ -78,8 +93,15 @@ TaskController = {
 
     async unmarkDone(req, res) {
         try {
-            const task = await Task.findByIdAndUpdate(req.params.id, { done: false }, { new: true });
-            return res.status(200).send(task);
+            const updatedTask = await Task.findByIdAndUpdate(req.params.id, { done: false }, { new: true });
+            const taskLists = await TaskList.find({});
+            taskLists.forEach(async taskList => {
+                const newTasks = taskList.tasks.map(task => {
+                    return task._id.valueOf() == updatedTask._id.valueOf() ? updatedTask : task;
+                });
+                await taskList.updateOne({tasks: newTasks});
+            });
+            return res.status(200).send(updatedTask);
         } catch (err) {
             return res.status(400).send({ error: "Id inválido, tarefa não atualizada" });
         }
