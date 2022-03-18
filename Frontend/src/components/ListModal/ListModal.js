@@ -1,44 +1,47 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styles from './ListModal.module.css';
 import Modal from 'react-modal';
 import { AiOutlineClose } from 'react-icons/ai';
 import api from '../../services/api';
 
-const ListModal = React.forwardRef((props, ref) => {
+const ListModal = ({list, setList, open, closeModal, updateState}) => {
 
-    const [ list, setList ] = useState(props.list || {});
-
-    const closeModal = useCallback(() => {
-        setList({});
-        ref.current?.portal.close();
-    }, [ref]);
+    const [isNewList, setIsNewList] = useState(true);
 
     const submitChanges = useCallback(async () => {
         try{
-            if(!props.list){
-                await api.post('/task_lists', list );
+            let response;
+            if(isNewList){
+                response = await api.post('/task_lists', list );
             } else {
-                await api.put('/task_lists', list );
+                response = await api.put(`/task_lists/${list._id}`, list );
             }
+            setList(response.data);
             closeModal();
+            updateState();
         } catch(err){
             console.error(err);
         }
-    }, [closeModal, list.name, props.list]);
+    }, [closeModal, isNewList, list, setList, updateState]);
+
+    useEffect(()=>{
+        setIsNewList(Object.keys(list).length === 0);
+        if(isNewList) setList({color: "#f16775"});
+    }, [open]);
 
     return (
         <Modal
-            ref={ref}
             className={styles.modal}
+            isOpen={open}
             overlayClassName={styles.modal__overlay}
             onRequestClose={closeModal}
-            style={{content: {backgroundColor: props.list ? list.color : "var(--pink)"}}}
+            style={{content: {backgroundColor: 'color' in list ? list.color : "var(--pink)"}}}
             shouldCloseOnEsc
             shouldCloseOnOverlayClick
         >
             <AiOutlineClose onClick={closeModal} size={18} className={styles.modal__close} />
             <h2 className={styles.modal__title}>
-                {!Object.keys(list).length ? "Criar" : "Editar"} Lista de Tarefas
+                {isNewList ? "Criar" : "Editar"} Lista de Tarefas
             </h2>
             <div className={styles.modal__field}>
                 <span>Nome </span>
@@ -46,7 +49,7 @@ const ListModal = React.forwardRef((props, ref) => {
             </div>
             <div className={styles.modal__field}>
                 <span>Cor </span>
-                <input value={list.color || "#FFF"} onChange={(event)=>setList({...list, name:event.target.value})} />
+                <input value={list.color} onChange={(event)=>setList({...list, color:event.target.value})} />
             </div>
             <div className={styles.modal__buttons}>
                 <button className={styles.modal__button__submit} onClick={submitChanges}>
@@ -58,6 +61,6 @@ const ListModal = React.forwardRef((props, ref) => {
             </div>
         </Modal>
     );
-});
+};
 
 export default ListModal;

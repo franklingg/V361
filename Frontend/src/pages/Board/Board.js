@@ -1,77 +1,203 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
-import styles from './Board.module.css';
-import Logo from '../../assets/logo.png';
-import Broken from '../../assets/broken.png';
-import api from '../../services/api';
-import { BsPlusLg } from 'react-icons/bs';
-import { Footer, Loading, ListModal } from '../../components';
+import { useState, useCallback, useEffect, useRef } from "react";
+import styles from "./Board.module.css";
+import Logo from "../../assets/logo.png";
+import Broken from "../../assets/broken.png";
+import api from "../../services/api";
+import { BsPlusLg } from "react-icons/bs";
+import {
+  AiOutlineEdit,
+  AiOutlineDelete,
+  AiOutlinePlusCircle,
+} from "react-icons/ai";
+import { Footer, Loading, ListModal, TaskModal } from "../../components";
 
-export default function Board(){
-    const [ loading, setLoading ] = useState(true);
-    const [ apiOn, setApiOn ] = useState(true);
-    const [ lists, setLists ] = useState([]);
-    const [ tags, setTags ] = useState([]);
-    const [ modalList, setModalList ] = useState();
-    const listModalRef = useRef(null);
-    
-    const openNewTaskModal = useCallback(()=>{
-        listModalRef.current?.portal.open();
-        console.log(listModalRef.current);
-    },[]);
+export default function Board() {
+  const [loading, setLoading] = useState(true);
+  const [apiOn, setApiOn] = useState(true);
+  const [lists, setLists] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [openListModal, setOpenListModal] = useState(false);
+  const [openTaskModal, setOpenTaskModal] = useState(false);
+  const [listModal, setListModal] = useState({});
+  const [taskModal, setTaskModal] = useState({});
 
-    useEffect(()=>{
-        const getInfo = async ()=> {
-            const responseTags = await api.get('/tags');
-            const responseLists = await api.get('/task_lists');
-            setTags(responseTags.data);
-            setLists(responseLists.data);
-            console.info("Informações da API lidas e salvas");
-        };
+  const openModalList = useCallback((list = {}) => {
+    setListModal(list);
+    setOpenListModal(true);
+  }, []);
 
-        api.get('/').then(()=>{
-            setLoading(true);
-            getInfo();
-        }).catch(() => {
-            setApiOn(false);
-            console.error('API fora do ar.')
-        }).finally( () => {
-            setLoading(false);
-        });
-    }, []);
-    
-    return(
-        <div className={styles.board}>
-            <header className={styles.board__header}>
-                <img src={Logo} alt="Logo da V361" className={styles.board__header__logo} />
-                <h1 className={styles.board__header__title}>Meu Board de Tarefas</h1>
-            </header>
-            <main className={styles.board__main}>
-                {
-                    loading ? (
-                        <Loading />
-                    ) : !apiOn ? (
-                        <div className={styles.board__main__off}>
-                            <div className={styles.board__main__off__text}>
-                                <h2>Eita!!</h2>
-                                <p>
-                                    Parece que sua conexão não pôde ser feita com nossa API. 
-                                    Verifique sua conexão, atualize a página ou tente mais tarde.
-                                </p>
-                            </div>
-                            <img src={Broken} alt="Sem conexão" />
-                        </div>
-                    ) : (
-                        <div className={styles.board__main__on}>
-                            {}
-                            <button className={styles.board__main__add} onClick={openNewTaskModal}>
-                                <BsPlusLg />
-                            </button>
-                        </div>
-                    )
-                }
-            </main>
-            <Footer color="var(--blue)" />
-            <ListModal ref={listModalRef} task={modalList} />
-        </div>
-    );
+  const openModalTask = useCallback((list, task = {}) => {
+    setListModal(list);
+    setTaskModal(task);
+    setOpenTaskModal(true);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setListModal({});
+    setTaskModal({});
+    setOpenListModal(false);
+    setOpenTaskModal(false);
+  }, []);
+
+  const updateState = useCallback(() => {
+    const getInfo = async () => {
+      const responseTags = await api.get("/tags");
+      const responseLists = await api.get("/task_lists");
+      setTags(responseTags.data);
+      setLists(responseLists.data);
+      console.info("Informações da API lidas e salvas");
+    };
+
+    api
+      .get("/")
+      .then(() => {
+        setLoading(true);
+        getInfo();
+      })
+      .catch(() => {
+        setApiOn(false);
+        console.error("API fora do ar.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  const deleteList = useCallback(
+    async (deleteList) => {
+      await api.delete(`/task_lists/${deleteList._id}`);
+      updateState();
+    },
+    [updateState]
+  );
+
+  const deleteTask = useCallback(
+    async (deleteTask) => {
+      await api.delete(`/tasks/${deleteTask._id}`);
+      updateState();
+    },
+    [updateState]
+  );
+
+  const markTask = useCallback(
+    async (task, mark) => {
+      await api.patch(`/tasks/${task._id}/${mark ? 'done' : 'not_done'}`);
+      updateState();
+    },
+    [updateState]
+  );
+
+  useEffect(() => {
+    updateState();
+  }, [updateState]);
+
+  return (
+    <div className={styles.board}>
+      <header className={styles.board__header}>
+        <img
+          src={Logo}
+          alt="Logo da V361"
+          className={styles.board__header__logo}
+        />
+        <h1 className={styles.board__header__title}>Meu Board de Tarefas</h1>
+      </header>
+      <main className={styles.board__main}>
+        {loading ? (
+          <Loading />
+        ) : !apiOn ? (
+          <div className={styles.board__main__off}>
+            <div className={styles.board__main__off__text}>
+              <h2>Eita!!</h2>
+              <p>
+                Parece que sua conexão não pôde ser feita com nossa API.
+                Verifique sua conexão, atualize a página ou tente mais tarde.
+              </p>
+            </div>
+            <img src={Broken} alt="Sem conexão" />
+          </div>
+        ) : (
+          <div className={styles.board__main__on}>
+            {lists.map((list) => (
+              <div
+                className={styles.board__card}
+                style={{ backgroundColor: list.color }}
+              >
+                <AiOutlineEdit
+                  size={20}
+                  className={styles.board__card__edit}
+                  onClick={() => {
+                    openModalList(list);
+                  }}
+                />
+                <AiOutlineDelete
+                  size={20}
+                  className={styles.board__card__delete}
+                  onClick={() => {
+                    deleteList(list);
+                  }}
+                />
+                <h3>{list.name}</h3>
+                {list.tasks?.map((task) => (
+                  <div className={styles.board__card__task}>
+                    <input
+                      type="checkbox"
+                      checked={task.done}
+                      onChange={(e) => {
+                        markTask(task, e.target.checked);
+                      }}
+                    />
+                    <span>{task.name}</span>
+                    <AiOutlineEdit
+                      size={16}
+                      className={styles.board__task__edit}
+                      onClick={() => {
+                        openModalTask(list, task);
+                      }}
+                    />
+                    <AiOutlineDelete
+                      size={16}
+                      onClick={() => {
+                        deleteTask(task);
+                      }}
+                    />
+                  </div>
+                ))}
+                <AiOutlinePlusCircle
+                  size={27}
+                  className={styles.board__card__add}
+                  onClick={() => {
+                    openModalTask(list);
+                  }}
+                />
+              </div>
+            ))}
+            <button
+              className={styles.board__main__add}
+              onClick={() => {
+                openModalList();
+              }}
+            >
+              <BsPlusLg />
+            </button>
+          </div>
+        )}
+      </main>
+      <Footer color="var(--blue)" />
+      <ListModal
+        open={openListModal}
+        closeModal={closeModal}
+        list={listModal}
+        setList={setListModal}
+        updateState={updateState}
+      />
+      <TaskModal
+        open={openTaskModal}
+        closeModal={closeModal}
+        list={listModal}
+        task={taskModal}
+        setTask={setTaskModal}
+        updateState={updateState}
+      />
+    </div>
+  );
 }
