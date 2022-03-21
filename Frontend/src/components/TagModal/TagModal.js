@@ -32,11 +32,6 @@ export default function TagModal({ open, closeModal, updateState }) {
       shouldCloseOnOverlayClick
       shouldFocusAfterRender={false}
     >
-      <AiOutlineClose
-        onClick={closeModal}
-        size={18}
-        className={styles.modal__close}
-      />
       <h2 className={styles.modal__title}>Criar Tag</h2>
       <div className={styles.modal__field}>
         <span>Título </span>

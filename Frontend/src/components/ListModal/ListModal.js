@@ -39,7 +39,6 @@ const ListModal = ({list, setList, open, closeModal, updateState}) => {
             shouldCloseOnEsc
             shouldCloseOnOverlayClick
         >
-            <AiOutlineClose onClick={closeModal} size={18} className={styles.modal__close} />
             <h2 className={styles.modal__title}>
                 {isNewList ? "Criar" : "Editar"} Lista de Tarefas
             </h2>
