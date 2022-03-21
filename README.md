@@ -1,5 +1,7 @@
 <h1 align=center> 📫  <strong>V361</strong>  📫 </h1>
 
+Sistema feito como desafio para a seletiva de estagiário na <a href="https://virtual360.io">V360</a>
+
 <h2>Descrição</h2>
 <p>
     &ensp;&ensp;V361 é um sistema web responsável por permitir ao usuário gerar e organizar diferentes listas de tarefas.
