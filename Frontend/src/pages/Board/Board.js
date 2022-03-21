@@ -130,7 +130,7 @@ export default function Board() {
           className={styles.board__header__logo}
         />
         <h1 className={styles.board__header__title}>Meu Board de Tarefas</h1>
-        <button className={styles.board__header__tags} onClick={()=>setOpenTagModal(true)}> <AiOutlineAppstoreAdd size={18} /> Tags</button>
+        {apiOn && <button className={styles.board__header__tags} onClick={()=>setOpenTagModal(true)}> <AiOutlineAppstoreAdd size={18} /> Tags</button>}
       </header>
       <main className={styles.board__main}>
         {loading ? (
