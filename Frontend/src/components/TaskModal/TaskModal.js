@@ -58,11 +58,6 @@ export default function TaskModal({
       shouldCloseOnOverlayClick
       shouldFocusAfterRender={false}
     >
-      <AiOutlineClose
-        onClick={closeModal}
-        size={18}
-        className={styles.modal__close}
-      />
       <h2 className={styles.modal__title}>
         {isNewTask ? "Criar" : "Editar"} Tarefa
       </h2>
